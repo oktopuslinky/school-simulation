@@ -48,7 +48,7 @@ class TakeInput():
             
             self.the_user_input = user_input
             return
-            
+
 class MenuController():
     def __init__(self):
         self.teacher_list = list()
@@ -56,12 +56,17 @@ class MenuController():
         self.course_list = list()
         self.done = False
 
+        self.user_choice = 0
+
     def run(self):
         print("Running")
         
         while self.done is False:
             self.disp_action_menu()
             possible_choices = [1,2,3,4,5,6]
+
+            self.user_choice = TakeInput("int", "Insert Choice").the_user_input
+            self.redirect_user()
 
     def add_course(self):
         pass
