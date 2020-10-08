@@ -1,32 +1,63 @@
 import sys
 
-
-
 class Item:
     def __init__(self, name=None):
         self.name = name
+'''
+** DATA STRUCTURE **
 
+courses=[
+    {
+        course: "courseName", 
+        students: [students], 
+        teachers: [teachers]
+    }, 
+    ETC
+]
+
+students[
+    {
+        name: "name",
+        courses: {
+            Course1: Teacher1,
+            course2: teacher2,
+            etc
+        }
+    },
+    ETC
+]
+
+teachers[
+    {
+        name: "name",
+        courses{
+            course1: [students]
+            course2: [students]
+        }
+    }
+]
+'''
 class Course(Item):
-    def __init__(self, name=None, teachers=None, students=None):
+    def __init__(self, name):
         super().__init__(name)
-        self.teachers = teachers
-        self.students = students
+        self.teachers = []
+        self.students = []
 
-        self.identity = {"Name": self.name, "Teachers": self.teachers, "Students": self.students}
-
-class Teacher(Item):
-    def __init__(self, name=None, students=None):
-        super().__init__(name)
-        self.students = students
-
-        self.identity = {"Name": self.name, "Students": self.students}
+        self.identity = {"Course": self.name, "Teachers": self.teachers, "Students": self.students}
 
 class Student(Item):
-    def __init__(self, name=None, teachers=None):
+    def __init__(self, name):
         super().__init__(name)
-        self.teachers = teachers
+        self.teachers = []
 
-        self.identity = {"Name": self.name, "Teachers": self.teachers}
+        self.identity = {"Name": self.name, "Courses": {}}
+
+class Teacher(Item):
+    def __init__(self, name):
+        super().__init__(name)
+        self.students = []
+
+        self.identity = {"Name": self.name, "Courses":{}}
 
 class TakeInput():
     def __init__(self, input_type, input_disp_text):
@@ -117,7 +148,8 @@ class MenuController():
             print("This course already exists in the system.")
             print("You will be redirected to the main menu.")
         else:
-            self.course_list.append(course_name)
+            new_course = Course(course_name)
+            self.course_list.append(new_course.identity)
             print(self.course_list)
     
     def add_person(self):
@@ -131,7 +163,7 @@ class MenuController():
             if student_exists:
                 print("This student already exists in the system.")
             else:
-                new_person = Student(person_name, []).identity
+                new_person = Student(person_name).identity
                 print(new_person)
                 self.student_list.append(new_person)
                 print(self.student_list)
@@ -142,7 +174,7 @@ class MenuController():
                 print("This student already exists in the system.")
                 print("")
             else:
-                new_person = Teacher(person_name, []).identity
+                new_person = Teacher(person_name).identity
                 print(new_person)
                 self.teacher_list.append(new_person)
                 print(self.teacher_list)
@@ -152,12 +184,15 @@ class MenuController():
         course_exists = self.search("list", the_course, self.course_list)
         if course_exists:
             #remove course from course, students, and teachers lists.
+            self.course_list.remove(the_course)
+
             pass
-        
+
         else:
             print("You will be redirected to the main menu.")
 
     def remove_person(self):
+        #remove name from course, student, and teacher lists
         pass
 
     def assign_course(self):
