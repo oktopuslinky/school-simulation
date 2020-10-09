@@ -244,17 +244,13 @@ class MenuController():
 
     def remove_person(self):
         #remove person from course, student, and teacher lists
-        
         person_valid = False
         possible_values = ["s", "S", "t", "T"]
         while person_valid is False:
             person_type = TakeInput("str", "Is this person a student or teacher?").the_user_input
             if person_type in possible_values:
                 person_valid = True
-        '''
-        MAKE SURE!!!
-        REDO THIS ENTIRE PART TO MAKE IT FOR GENERAL PERSON INSTEAD OF TEACHER AND STUDENT
-        '''
+
         if person_type == "s" or person_type == "S":
             the_list = self.student_list
             person_course_key = "Students"
@@ -364,14 +360,14 @@ class MenuController():
 
     def get_max_lengths(self):
         #Course, students, teachers
-        max_course_lengths = [0,0,0]
-
+        max_course_lengths = [6,8,8]
+        '''
         #name, course, teacher
         max_student_lengths = [0,0,0]
 
         #name, course, students
         max_teacher_lengths = [0,0,0]
-
+        '''
         for row in self.course_list:
             if len(row["Course"]) > max_course_lengths[0]:
                 max_course_lengths[0] = len(row["Course"])
@@ -384,6 +380,33 @@ class MenuController():
                 if len(item) > max_course_lengths[2]:
                     max_course_lengths[2] = len(item)
 
+        passes = 0
+        while passes < 2:
+            if passes == 0:
+                the_list = self.student_list
+            elif passes == 1:
+                the_list = self.teacher_list
+
+            temp_lengths = [4,7,7]
+            for row in the_list:
+                if len(row["Name"]) > temp_lengths[0]:
+                    temp_lengths[0] = len(row["Course"])
+
+                for course in row["Courses"]:
+                    if len(course) > temp_lengths[1]:
+                        temp_lengths[1] = len(course)
+                    
+                    if len(row["Courses"][course]) > temp_lengths[2]:
+                        temp_lengths[2] = len(row["Courses"][course])
+            if passes == 0:
+                max_student_lengths = temp_lengths
+            elif passes == 1:
+                max_teacher_lengths = temp_lengths
+            
+            passes +=1
+        
+        return max_course_lengths, max_student_lengths, max_teacher_lengths
+        '''
         for row in self.student_list:
             if len(row["Name"]) > max_student_lengths[0]:
                 max_course_lengths[0] = len(row["Course"])
@@ -394,8 +417,21 @@ class MenuController():
                 
                 if len(row["Courses"][course]) > max_student_lengths[2]:
                     max_course_lengths[2] = len(row["Courses"][course])
-
+        '''
     def disp_info(self):
+        max_course, max_student, max_teacher = self.get_max_lengths()
+        print(
+            "╔" + max_course[0] * "═" +
+            "╦" + max_course[1] * "═" +
+            "╦" + max_course[2] * "═" +
+            "╗"
+        )
+        print(
+            "║" +
+            "Course" + " " * (max_course[0]-6) + "║" + 
+            "Students" + " " * (max_course[0]-8) + "║" +
+            "Teachers" + " " * (max_course[0]-8) + "║"
+        )
         print("Courses:")
         print(self.teacher_list)
 
