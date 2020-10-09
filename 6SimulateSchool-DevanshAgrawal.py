@@ -30,7 +30,7 @@ students[
 teachers[
     {
         Name: "name",
-        Courses{
+        Courses: {
             course1: [students]
             course2: [students]
         }
@@ -57,7 +57,7 @@ class Teacher(Item):
         super().__init__(name)
         self.students = []
 
-        self.identity = {"Name": self.name, "Courses":{}}
+        self.identity = {"Name": self.name, "Courses": {}}
 
 class TakeInput():
     def __init__(self, input_type, input_disp_text):
@@ -229,14 +229,52 @@ class MenuController():
             student_exists = self.search("dict_in_list", the_person, self.student_list, "Name")
             if student_exists:
                 #remove student from all lists
-                pass
-            
+                for a_course in self.course_list:
+                    students_in_course = a_course["Students"]
+                    for a_student in students_in_course:
+                        if a_student == the_person:
+                            students_in_course.remove(the_person)
+                
+                for student in self.student_list:
+                    if student["Name"] == the_person:
+                        self.student_list.remove(student)
+
+                for teacher in self.teacher_list:
+                    courses = teacher["Courses"]
+                    for course_key in courses:
+                        students_in_course = courses[course_key]
+                        for student in students_in_course:
+                            if student == the_person:
+                                students_in_course.remove(student)
+                print("Student", the_person, "has been removed.")
             else:
                 print("This student does not exist in the system.")
 
         elif person_type == "t" or person_type == "T":
-            #remove the teacehr from all lists.
-            pass
+            #remove the teacher from all lists.
+            teacher_exists = self.search("dict_in_list", the_person, self.teacher_list, "Name")
+            if teacher_exists:
+                for a_course in self.course_list:
+                    teachers_in_course = a_course["Teachers"]
+                    for a_teacher in teachers_in_course:
+                        if a_teacher == the_person:
+                            teachers_in_course.remove(the_person)
+                
+                for student in self.student_list:
+                    the_course_list = student["Courses"]
+                    for course_key in the_course_list:
+                        if the_course_list[course_key] == the_person:
+                            the_course_list.pop(course_key)
+                
+                for teacher in self.teacher_list:
+                    if teacher["Name"] == the_person:
+                        self.teacher_list.remove(teacher)
+                
+                print("Teacher", the_person, "has been removed.")
+
+            else:
+                print("This teacher does not exist in the system.")
+        
 
     def assign_course(self):
         pass
