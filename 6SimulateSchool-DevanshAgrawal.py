@@ -19,8 +19,8 @@ students[
     {
         Name: "name",
         Courses: {
-            Course1: Teacher1,
-            course2: teacher2,
+            Course1: [Teacher1],
+            course2: [teacher2],
             etc
         }
     },
@@ -45,6 +45,13 @@ class Course(Item):
 
         self.identity = {"Course": self.name, "Teachers": self.teachers, "Students": self.students}
 
+class Person(Item):
+    def __init__(self, name):
+        super().__init__(name)
+        self.related_people = []
+
+        self.identity = {"Name": self.name, "Courses": {}}
+'''
 class Student(Item):
     def __init__(self, name):
         super().__init__(name)
@@ -58,7 +65,7 @@ class Teacher(Item):
         self.students = []
 
         self.identity = {"Name": self.name, "Courses": {}}
-
+'''
 class TakeInput():
     def __init__(self, input_type, input_disp_text):
         self.input_type = input_type
@@ -161,19 +168,24 @@ class MenuController():
             person_type = TakeInput("str", 'Input "s" for student or "t" for teacher').the_user_input
             if person_type in possible_values:
                 person_valid = True
+        
+        if person_type == "s" or person_type == "S":
+            the_list = self.student_list
+        elif person_type == "t" or person_type == "T":
+            the_list == self.teacher_list
 
         person_name = input("What is the name of the new person?: ")
+        student_exists = self.search("dict_in_list", person_name, self.student_list, "Name")
+        if student_exists:
+            print("This student already exists in the system.")
+        else:
+            new_person = Person(person_name).identity
+            print(new_person)
+            the_list.append(new_person)
+            print(the_list)
+            print("The new person has been added to the system.")
 
-        if person_type == "s" or person_type == "S":
-            student_exists = self.search("dict_in_list", person_name, self.student_list, "Name")
-            if student_exists:
-                print("This student already exists in the system.")
-            else:
-                new_person = Student(person_name).identity
-                print(new_person)
-                self.student_list.append(new_person)
-                print(self.student_list)
-
+        '''
         elif person_type == "t" or person_type == "T":
             teacher_exists = self.search("dict_in_list", person_name, self.teacher_list, "Name")
             if teacher_exists:
@@ -184,30 +196,47 @@ class MenuController():
                 print(new_person)
                 self.teacher_list.append(new_person)
                 print(self.teacher_list)
+        '''
 
     def remove_course(self):
         the_course = input("What course do you want to remove?: ")
         course_exists = self.search("dict_in_list", the_course, self.course_list, "Course")
         if course_exists:
-            #remove course from course, students, and teachers lists.
+            #do two passes, one for student list, one for teacher list
+            passes = 0
+            while passes < 2:
+                if passes == 0:
+                    the_list = self.student_list
+                elif passes == 1:
+                    the_list = self.teacher_list
+
+                for person in the_list:
+                    person_courses = person["Courses"]
+                    for course in person_courses:
+                        if course == the_course:
+                            person_courses.pop(the_course)
+                            print(the_list)
+                
+                passes += 1
+            '''
             for student in self.student_list:
                 student_courses = student["Courses"]
                 for course in student_courses:
                     if course == the_course:
                         student_courses.pop(the_course)
                         print(self.student_list)
-            
+            '''
             for a_course in self.course_list:
                 if a_course["Course"] == the_course:
                     self.course_list.remove(a_course)
-            
+            '''
             for teacher in self.teacher_list:
                 teacher_courses = teacher["Courses"]
                 for course in teacher_courses:
                     if course == the_course:
                         teacher_courses.pop(the_course)
                         print(self.teacher_list)
-            
+            '''
             print("The course has successfully been removed from the system.")
 
         else:
@@ -222,7 +251,11 @@ class MenuController():
             person_type = TakeInput("str", "Is this person a student or teacher?").the_user_input
             if person_type in possible_values:
                 person_valid = True
-
+        '''
+        MAKE SURE!!!
+        REDO THIS ENTIRE PART TO MAKE IT FOR GENERAL PERSON INSTEAD OF TEACHER AND STUDENT
+        '''
+        
         the_person = input("What is the name of the person?: ")
         if person_type == "s" or person_type == "S":
             #remove the student from all lists
@@ -274,7 +307,6 @@ class MenuController():
 
             else:
                 print("This teacher does not exist in the system.")
-        
 
     def assign_course(self):
         pass
@@ -282,9 +314,43 @@ class MenuController():
     def unassign_course(self):
         pass
 
+    def get_max_lengths(self):
+        #Course, students, teachers
+        max_course_lengths = [0,0,0]
+
+        #name, course, teacher
+        max_student_lengths = [0,0,0]
+
+        #name, course, students
+        max_teacher_lengths = [0,0,0]
+
+        for row in self.course_list:
+            if len(row["Course"]) > max_course_lengths[0]:
+                max_course_lengths[0] = len(row["Course"])
+
+            for item in row["Students"]:
+                if len(item) > max_course_lengths[1]:
+                    max_course_lengths[1] = len(item)
+
+            for item in row["Students"]:
+                if len(item) > max_course_lengths[2]:
+                    max_course_lengths[2] = len(item)
+
+        for row in self.student_list:
+            if len(row["Name"]) > max_student_lengths[0]:
+                max_course_lengths[0] = len(row["Course"])
+
+            for course in row["Courses"]:
+                if len(course) > max_student_lengths[1]:
+                    max_course_lengths[1] = len(course)
+                
+
+                if len(row["Courses"][course]) > max_student_lengths[2]:
+                    max_course_lengths[2] = len(row["Courses"][course])
+
     def disp_info(self):
         print("Courses:")
-        print(self.course_list)
+        print(self.teacher_list)
 
         print("Teachers:")
         print(self.teacher_list)
@@ -342,8 +408,7 @@ the_menu.run()
 
 '''
 TODO:
-remove_course()
-remove_person()
+
 assign_course()
 unassign_course()
 disp_info()
