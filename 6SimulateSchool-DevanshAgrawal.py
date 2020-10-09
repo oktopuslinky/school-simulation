@@ -8,17 +8,17 @@ class Item:
 
 courses=[
     {
-        course: "courseName", 
-        students: [students], 
-        teachers: [teachers]
+        Course: "courseName", 
+        Students: [students], 
+        Teachers: [teachers]
     }, 
     ETC
 ]
 
 students[
     {
-        name: "name",
-        courses: {
+        Name: "name",
+        Courses: {
             Course1: Teacher1,
             course2: teacher2,
             etc
@@ -29,8 +29,8 @@ students[
 
 teachers[
     {
-        name: "name",
-        courses{
+        Name: "name",
+        Courses{
             course1: [students]
             course2: [students]
         }
@@ -127,7 +127,7 @@ class MenuController():
                 if an_item == the_item:
                     return True
 
-            elif the_type == "dict":
+            elif the_type == "dict_in_list":
                 if an_item[the_key] == the_item:
                     return True
 
@@ -143,7 +143,7 @@ class MenuController():
 
     def add_course(self):
         course_name = input("What is the name of the new course?")
-        course_exists = self.search("list", course_name, self.course_list)
+        course_exists = self.search("dict_in_list", course_name, self.course_list, "Course")
         if course_exists:
             print("This course already exists in the system.")
             print("You will be redirected to the main menu.")
@@ -155,11 +155,17 @@ class MenuController():
     def add_person(self):
         #Create person and append to list
         print("Is this person a student or a teacher?")
-        person_type = TakeInput("str", 'Input "student" or "teacher"').the_user_input
+        person_valid = False
+        possible_values = ["s", "S", "t", "T"]
+        while person_valid is False:
+            person_type = TakeInput("str", 'Input "s" for student or "t" for teacher').the_user_input
+            if person_type in possible_values:
+                person_valid = True
+
         person_name = input("What is the name of the new person?: ")
 
-        if person_type == "student" or person_type == "Student":
-            student_exists = self.search("dict", person_name, self.student_list, "Name")
+        if person_type == "s" or person_type == "S":
+            student_exists = self.search("dict_in_list", person_name, self.student_list, "Name")
             if student_exists:
                 print("This student already exists in the system.")
             else:
@@ -168,8 +174,8 @@ class MenuController():
                 self.student_list.append(new_person)
                 print(self.student_list)
 
-        elif person_type == "teacher" or person_type == "Teacher":
-            teacher_exists = self.search("dict", person_name, self.teacher_list, "Name")
+        elif person_type == "t" or person_type == "T":
+            teacher_exists = self.search("dict_in_list", person_name, self.teacher_list, "Name")
             if teacher_exists:
                 print("This student already exists in the system.")
                 print("")
@@ -181,19 +187,56 @@ class MenuController():
 
     def remove_course(self):
         the_course = input("What course do you want to remove?: ")
-        course_exists = self.search("list", the_course, self.course_list)
+        course_exists = self.search("dict_in_list", the_course, self.course_list, "Course")
         if course_exists:
             #remove course from course, students, and teachers lists.
-            self.course_list.remove(the_course)
-
-            pass
+            for student in self.student_list:
+                student_courses = student["Courses"]
+                for course in student_courses:
+                    if course == the_course:
+                        student_courses.pop(the_course)
+                        print(self.student_list)
+            
+            for a_course in self.course_list:
+                if a_course["Course"] == the_course:
+                    self.course_list.remove(a_course)
+            
+            for teacher in self.teacher_list:
+                teacher_courses = teacher["Courses"]
+                for course in teacher_courses:
+                    if course == the_course:
+                        teacher_courses.pop(the_course)
+                        print(self.teacher_list)
+            
+            print("The course has successfully been removed from the system.")
 
         else:
             print("You will be redirected to the main menu.")
 
     def remove_person(self):
-        #remove name from course, student, and teacher lists
-        pass
+        #remove person from course, student, and teacher lists
+        
+        person_valid = False
+        possible_values = ["s", "S", "t", "T"]
+        while person_valid is False:
+            person_type = TakeInput("str", "Is this person a student or teacher?").the_user_input
+            if person_type in possible_values:
+                person_valid = True
+
+        the_person = input("What is the name of the person?: ")
+        if person_type == "s" or person_type == "S":
+            #remove the student from all lists
+            student_exists = self.search("dict_in_list", the_person, self.student_list, "Name")
+            if student_exists:
+                #remove student from all lists
+                pass
+            
+            else:
+                print("This student does not exist in the system.")
+
+        elif person_type == "t" or person_type == "T":
+            #remove the teacehr from all lists.
+            pass
 
     def assign_course(self):
         pass
