@@ -619,5 +619,4 @@ TODO:
 
 assign_course()
 unassign_course()
-disp_info()
 '''
