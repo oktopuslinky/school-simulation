@@ -37,6 +37,19 @@ teachers[
     }
 ]
 '''
+
+'''
+** OUTPUT TABLE STRUCTURE **
+
+-----
+|COURSES|TEACHERS|STUDENTS|
+
+|Course1|Teacher1|Student1|
+        |        |Student2|
+        |Teacher2|Student1|
+|Course2|
+
+'''
 class Course(Item):
     def __init__(self, name):
         super().__init__(name)
@@ -172,7 +185,7 @@ class MenuController():
         if person_type == "s" or person_type == "S":
             the_list = self.student_list
         elif person_type == "t" or person_type == "T":
-            the_list == self.teacher_list
+            the_list = self.teacher_list
 
         person_name = input("What is the name of the new person?: ")
         student_exists = self.search("dict_in_list", person_name, self.student_list, "Name")
@@ -359,15 +372,16 @@ class MenuController():
         pass
 
     def get_max_lengths(self):
+        '''
         #Course, students, teachers
         max_course_lengths = [6,8,8]
-        '''
+
         #name, course, teacher
         max_student_lengths = [0,0,0]
 
         #name, course, students
         max_teacher_lengths = [0,0,0]
-        '''
+
         for row in self.course_list:
             if len(row["Course"]) > max_course_lengths[0]:
                 max_course_lengths[0] = len(row["Course"])
@@ -390,7 +404,7 @@ class MenuController():
             temp_lengths = [4,7,7]
             for row in the_list:
                 if len(row["Name"]) > temp_lengths[0]:
-                    temp_lengths[0] = len(row["Course"])
+                    temp_lengths[0] = len(row["Name"])
 
                 for course in row["Courses"]:
                     if len(course) > temp_lengths[1]:
@@ -407,6 +421,55 @@ class MenuController():
         
         return max_course_lengths, max_student_lengths, max_teacher_lengths
         '''
+
+        #courses, teachers, students
+        max_lengths = [7,8,8]
+
+        for row in self.course_list:
+            if len(row["Course"]) > max_lengths[0]:
+                max_lengths[0] = len(row["Course"])
+
+            for item in row["Teachers"]:
+                if len(item) > max_lengths[1]:
+                    max_lengths[1] = len(item)
+
+            for item in row["Students"]:
+                if len(item) > max_lengths[2]:
+                    max_lengths[2] = len(item)
+
+        passes = 0
+        while passes < 2:
+            if passes == 0:
+                the_list = self.student_list
+                compare_value = max_lengths[2]
+                other_person_length = max_lengths[1]
+            elif passes == 1:
+                the_list = self.teacher_list
+                compare_value = max_lengths[1]
+                other_person_length = max_lengths[2]
+
+            for row in the_list:
+                if len(row["Name"]) > compare_value:
+                    compare_value = len(row["Name"])
+
+                for course in row["Courses"]:
+                    if len(course) > max_lengths[0]:
+                        temp_lengths[1] = len(course)
+
+                    if len(row["Courses"][course]) > other_person_length:
+                        other_person_length = len(row["Courses"][course])
+            
+            if passes == 0:
+                max_lengths[2] = compare_value
+                max_lengths[1] = other_person_length
+            elif passes == 1:
+                max_lengths[1] = compare_value
+                max_lengths[2] = other_person_length
+            
+            passes +=1
+        
+        return max_lengths
+        '''
         for row in self.student_list:
             if len(row["Name"]) > max_student_lengths[0]:
                 max_course_lengths[0] = len(row["Course"])
@@ -419,19 +482,81 @@ class MenuController():
                     max_course_lengths[2] = len(row["Courses"][course])
         '''
     def disp_info(self):
-        max_course, max_student, max_teacher = self.get_max_lengths()
+        print("ALL STUDENTS AND TEACHERS ENROLLED IN A COURSE")
+        max_lengths = self.get_max_lengths()
         print(
-            "╔" + max_course[0] * "═" +
-            "╦" + max_course[1] * "═" +
-            "╦" + max_course[2] * "═" +
+            "╔" + max_lengths[0] * "═" +
+            "╦" + max_lengths[1] * "═" +
+            "╦" + max_lengths[2] * "═" +
             "╗"
         )
         print(
             "║" +
-            "Course" + " " * (max_course[0]-6) + "║" + 
-            "Students" + " " * (max_course[0]-8) + "║" +
-            "Teachers" + " " * (max_course[0]-8) + "║"
+            "Course" + " " * (max_lengths[0]-6) + "║" + 
+            "Teachers" + " " * (max_lengths[1]-8) + "║" +
+            "Students" + " " * (max_lengths[2]-8) + 
+            "║"
         )
+        print(
+            "╠" + (max_lengths[0] * "═") +
+            "╬" + (max_lengths[1] * "═") +
+            "╬" + (max_lengths[2] * "═") +
+            "╣"
+        )
+        for course in self.course_list:
+            print(
+                "║" + course["Course"] + " " * (max_lengths[0]-len(course["Course"])) +
+                "║" + " " * max_lengths[1] +
+                "║" + " " * max_lengths[2] + "║"
+            )
+            for teacher in course["Teachers"]:
+                print(
+                    "║" + " " * max_lengths[0] + 
+                    "║" + teacher + " " * (max_lengths[1]-len(teacher)) +
+                    "║" + " " * max_lengths[2] + "║"
+                )
+            for student in course["Students"]:
+                print(
+                    "║" + " " * max_lengths[0] +
+                    "║" + " " * max_lengths[1] +
+                    "║" + student + " " * (max_lengths[2]-len(student)) + "║"
+                )
+        print(
+            "╚" + (max_lengths[0] * "═") +
+            "╩" + (max_lengths[1] * "═") +
+            "╩" + (max_lengths[2] * "═") +
+            "╝"
+        )
+
+        print("---")
+
+        print("ALL COURSES:")
+        print("╔" + max_lengths[0] * "═" + "╗")
+        for course in self.course_list:
+            print("║" + course["Course"] + " " * (max_lengths[0] - len(course["Course"])) + "║")
+
+        print("╚" + (max_lengths[0] * "═") + "╝")
+
+        print("---")
+
+        print("ALL TEACHERS:")
+        print("╔" + max_lengths[1] * "═" + "╗")
+        for teacher in self.teacher_list:
+            print("║" + teacher["Name"] + " " * (max_lengths[1] - len(teacher["Name"])) + "║")
+
+        print("╚" + (max_lengths[1] * "═") + "╝")
+
+        print("---")
+
+        print("ALL STUDENTS:")
+        print("╔" + max_lengths[2] * "═" + "╗")
+        for student in self.student_list:
+            print("║" + student["Name"] + " " * (max_lengths[2] - len(student["Name"])) + "║")
+
+        print("╚" + (max_lengths[2] * "═") + "╝")
+
+        print("---")
+
         print("Courses:")
         print(self.teacher_list)
 
