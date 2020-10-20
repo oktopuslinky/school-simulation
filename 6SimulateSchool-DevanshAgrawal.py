@@ -41,14 +41,15 @@ teachers[
 '''
 ** OUTPUT TABLE STRUCTURE **
 
------
+|-------------------------|
 |COURSES|TEACHERS|STUDENTS|
-
+|-------------------------|
 |Course1|Teacher1|Student1|
-        |        |Student2|
-        |Teacher2|Student1|
-|Course2|
-
+|       |        |Student2|
+|       |Teacher2|Student1|
+|-------------------------|
+|Course2|        |        |
+|-------------------------|
 '''
 class Course(Item):
     def __init__(self, name):
@@ -92,7 +93,7 @@ class TakeInput():
             while input_valid is False:
                 try:
                     user_input = int(input(self.input_disp_text + ": "))
-                    if user_input is not None:
+                    if user_input:
                         input_valid = True
                 except:
                     print("Please try again.")
@@ -106,8 +107,8 @@ class TakeInput():
             while input_valid is False:
                 try:
                     user_input = str(input(self.input_disp_text + " (Y/N): "))
-                    if user_input is not None and user_input in possible_values:
-                        break
+                    if user_input and user_input in possible_values:
+                        input_valid = True
                 except:
                     print("Please try again.")
             
@@ -119,13 +120,24 @@ class TakeInput():
             while input_valid is False:
                 try:
                     user_input = str(input(self.input_disp_text + ": "))
-                    if user_input is not None:
+                    if user_input:
                         input_valid = True
                 except:
                     print("Please try again.")
 
             self.the_user_input = user_input
             return
+
+        if self.input_type == "person_type":
+            possible_values = ["s", "S", "t", "T"]
+            input_valid = False
+            while input_valid is False:
+                try:
+                    user_input = str(input(self.input_disp_text + ": "))
+                    if user_input and user_input in possible_values:
+                        input_valid = True
+                except:
+                    print("Please try again.")
 
 class MenuController():
     def __init__(self):
@@ -175,12 +187,14 @@ class MenuController():
     def add_person(self):
         #Create person and append to list
         print("Is this person a student or a teacher?")
-        person_valid = False
+        person_type = TakeInput("person_type", 'Input "s" for student or "t" for teacher').the_user_input
+
+        '''person_valid = False
         possible_values = ["s", "S", "t", "T"]
         while person_valid is False:
             person_type = TakeInput("str", 'Input "s" for student or "t" for teacher').the_user_input
             if person_type in possible_values:
-                person_valid = True
+                person_valid = True'''
         
         if person_type == "s" or person_type == "S":
             the_list = self.student_list
@@ -253,16 +267,22 @@ class MenuController():
             print("The course has successfully been removed from the system.")
 
         else:
+            print("This course does not exist in the system.")
             print("You will be redirected to the main menu.")
 
     def remove_person(self):
         #remove person from course, student, and teacher lists
+        print("Is this person a student or teacher?")
+        person_type = TakeInput("person_type", 'Input "s" for student or "t" for teacher')
+
+        '''
         person_valid = False
         possible_values = ["s", "S", "t", "T"]
         while person_valid is False:
             person_type = TakeInput("str", "Is this person a student or teacher?").the_user_input
             if person_type in possible_values:
                 person_valid = True
+        '''
 
         if person_type == "s" or person_type == "S":
             the_list = self.student_list
@@ -365,8 +385,71 @@ class MenuController():
             else:
                 print("This teacher does not exist in the system.")
             '''
+    
     def assign_course(self):
-        pass
+        #Get course name first
+        course_exists = False
+        while course_exists is False:
+            course_name = TakeInput("str", "What is the name of the course?").the_user_input
+            course_exists = self.search("dict_in_list", course_name, self.course_list, "Course")
+            if course_exists is False:
+                print("This course does not exist in the system. Please try again.")
+
+        print("Is the course being assigned to a student or a teacher?")
+        
+        person_type = TakeInput("person_type", 'Input "s" for student and "t" for teacher').the_user_input
+        if person_type == "s" or person_type == "S":
+            the_list = self.student_list
+        elif person_type == "t" or person_type == "T":
+            the_list = self.teacher_list
+            
+        person_exists = False
+        while person_exists is False:    
+            person_name = input("What is the name of the person?: ")
+            person_exists = self.search("dict_in_list", person_name, the_list, "Name")
+            if person_exists is False:
+                print("This person does not exist in the system. Please try again.")
+        
+        for course in the_list:
+            if course["Course"] == course_name:
+                course["Students"].append(person_name)
+        
+        for person in the_list:
+            if person["Name"] == person_name:
+                person["Courses"].append({course_name: []})
+
+        if person_type == "s" or person_type == "S":
+            self.student_list = the_list
+            #get teacher name, add student to teacher list
+        elif person_type == "t" or person_type == "T":
+            self.teacher_list = the_list
+            #do a loop asking for students names
+            #and put teacher into student course (respectively)  
+            input_end = False
+            students_to_append = []
+            while input_end is False:
+                #take student name one by one and add to
+                #students_to_append list.
+                pass
+
+            for a_student in students_to_append:
+                #add teacher to student
+                pass
+        '''
+        if person_type == "s" or person_type == "S":
+            # if teacher, then add to course and teacher lists
+            for course in self.course_list:
+                if course["Course"] == course_name:
+                    course["Students"].append(person_name)
+            
+            for student in self.student_list:
+                student["Courses"].append({course_name: []})
+            pass
+        elif person_type == "t" or person_type == "T":
+            # if student, then put student in course, student, and teacher lists
+            pass
+        '''
+        
 
     def unassign_course(self):
         pass
@@ -481,6 +564,7 @@ class MenuController():
                 if len(row["Courses"][course]) > max_student_lengths[2]:
                     max_course_lengths[2] = len(row["Courses"][course])
         '''
+    
     def disp_info(self):
         print("ALL STUDENTS AND TEACHERS ENROLLED IN A COURSE")
         max_lengths = self.get_max_lengths()
@@ -521,6 +605,12 @@ class MenuController():
                     "║" + " " * max_lengths[1] +
                     "║" + student + " " * (max_lengths[2]-len(student)) + "║"
                 )
+            print(
+                "╟" + (max_lengths[0] * "═") +
+                "╫" + (max_lengths[1] * "═") +
+                "╫" + (max_lengths[2] * "═") +
+                "╫"
+            )
         print(
             "╚" + (max_lengths[0] * "═") +
             "╩" + (max_lengths[1] * "═") +
