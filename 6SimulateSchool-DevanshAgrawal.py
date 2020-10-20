@@ -418,6 +418,16 @@ class MenuController():
             if person["Name"] == person_name:
                 person["Courses"].append({course_name: []})
 
+        '''
+        NOTE: CONDENSE THE S AND T PORTIONS INTO ONE
+        '''
+        if person_type == "s" or person_type == "S":
+            self.student_list = the_list
+            other_type_list = self.teacher_list
+        elif person_type == "t" or person_type == "T":
+            self.teacher_list = the_list
+            other_type_list = self.student_list
+        '''
         if person_type == "s" or person_type == "S":
             self.student_list = the_list
             #get teacher name, add student to teacher list
@@ -430,11 +440,43 @@ class MenuController():
             while input_end is False:
                 #take student name one by one and add to
                 #students_to_append list.
-                pass
+                person_exists = False
+                while person_exists is False:    
+                    person_name = input("What is the name of the person?: ")
+                    person_exists = self.search("dict_in_list", person_name, self.student_list, "Name")
+                    if person_exists is False:
+                        print("This person does not exist in the system. Please try again.")
+                students_to_append.append(person_name)
+                to_quit = TakeInput("verify", "Do you want to quit inputting students?").the_user_input
+                if to_quit == "y" or to_quit == "Y":
+                    input_end = True
 
             for a_student in students_to_append:
-                #add teacher to student
+                # loop through list and append teacher to course per student 
                 pass
+        '''
+        input_end = False
+        people_to_append = []
+        while input_end is False:
+            #take student name one by one and add to
+            #students_to_append list.
+            person_exists = False
+            while person_exists is False:    
+                person_name = input("What is the name of the person?: ")
+                person_exists = self.search("dict_in_list", person_name, other_type_list, "Name")
+                if person_exists is False:
+                    print("This person does not exist in the system. Please try again.")
+            people_to_append.append(person_name)
+            to_quit = TakeInput("verify", "Do you want to quit inputting students?").the_user_input
+            if to_quit == "y" or to_quit == "Y":
+                input_end = True
+
+        for a_person in people_to_append:
+            # loop through list and append person to course per other person 
+            # First find person in the respective list
+            pass
+            '''for course_key in person["Courses"]:
+                person["Courses"][course_key].append'''
         '''
         if person_type == "s" or person_type == "S":
             # if teacher, then add to course and teacher lists
