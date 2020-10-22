@@ -348,10 +348,40 @@ class MenuController():
                 if course["Course"] == course_name:
                     course["Teachers"].append(person_name)
             # other_type_list = self.student_list
-        
 
     def unassign_course(self):
-        pass
+        course_exists = False
+        while course_exists is False:
+            course_name = TakeInput("str", "What is the name of the course?").the_user_input
+            course_exists = self.search("dict_in_list", course_name, self.course_list, "Course")
+            if course_exists is False:
+                print("This course does not exist in the system. Please try again.")
+        
+        print("Is the course being unassigned from a student or teacher?")
+        person_type = TakeInput("person_type", 'Input "s" for student and "t" for teacher').the_user_input
+
+        if person_type == "s" or person_type == "S":
+            the_list = self.student_list
+        elif person_type == "t" or person_type == "T":
+            the_list = self.teacher_list
+
+        person_exists = False
+        while person_exists is False:    
+            person_name = input("What is the name of the person?: ")
+            person_exists = self.search("dict_in_list", person_name, the_list, "Name")
+            if person_exists is False:
+                print("This person does not exist in the system. Please try again.")
+
+        for person in the_list:
+            if person["Name"] == person_name:
+                person["Courses"].pop(course_name)
+        
+        #Unassign course in the course list for person
+        #TODO
+        if person_type == "s" or person_type == "S":
+            self.student_list = the_list
+        elif person_type == "t" or person_type == "T":
+            self.teacher_list = the_list
 
     def get_max_lengths(self):
         #courses, teachers, students
