@@ -186,40 +186,28 @@ class MenuController():
         else:
             new_course = Course(course_name)
             self.course_list.append(new_course.identity)
-            print(self.course_list)
     
     def add_person(self):
         #Create person and append to list
         print("Is this person a student or a teacher?")
         person_type = TakeInput("person_type", 'Input "s" for student or "t" for teacher').the_user_input
-        print(person_type)
                 
         if person_type == "s" or person_type == "S":
-            print("makign choices")
-            print(person_type)
             the_list = self.student_list
-            print(the_list)
         elif person_type == "t" or person_type == "T":
             the_list = self.teacher_list
-            print(the_list)
 
-        print(person_type)
-        print(the_list)
         person_name = input("What is the name of the new person?: ")
         student_exists = self.search("dict_in_list", person_name, self.student_list, "Name")
         if student_exists:
             print("This student already exists in the system.")
         else:
             new_person = Person(person_name).identity
-            print(new_person)
             the_list.append(new_person)
-            print(the_list)
             print("The new person has been added to the system.")
 
         if person_type == "s" or person_type == "S":
-            print("choice is being made")
             self.student_list = the_list
-            print(self.student_list)
         elif person_type == "t" or person_type == "T":
             self.teacher_list = the_list
 
@@ -240,7 +228,6 @@ class MenuController():
                     for course in person_courses:
                         if course == the_course:
                             person_courses.pop(the_course)
-                            print(the_list)
                 
                 passes += 1
 
@@ -380,8 +367,15 @@ class MenuController():
         #TODO
         if person_type == "s" or person_type == "S":
             self.student_list = the_list
+            key = "Students"
         elif person_type == "t" or person_type == "T":
             self.teacher_list = the_list
+            key = "Teachers"
+        
+        for course in self.course_list:
+            for person in course[key]:
+                if person == person_name:
+                    course[key].remove(person)
 
     def get_max_lengths(self):
         #courses, teachers, students
@@ -519,15 +513,6 @@ class MenuController():
 
         print("---")
 
-        print("Courses:")
-        print(self.teacher_list)
-
-        print("Teachers:")
-        print(self.teacher_list)
-
-        print("Students:")
-        print(self.student_list)
-
     def disp_action_menu(self):
         print(
             '''
@@ -575,8 +560,3 @@ class MenuController():
 
 the_menu = MenuController()
 the_menu.run()
-
-'''
-TODO:
-unassign_course()
-'''
