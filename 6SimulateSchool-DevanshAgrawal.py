@@ -243,7 +243,7 @@ class MenuController():
     def remove_person(self):
         #remove person from course, student, and teacher lists
         print("Is this person a student or teacher?")
-        person_type = TakeInput("person_type", 'Input "s" for student or "t" for teacher')
+        person_type = TakeInput("person_type", 'Input "s" for student or "t" for teacher').the_user_input
 
         if person_type == "s" or person_type == "S":
             the_list = self.student_list
@@ -429,8 +429,6 @@ class MenuController():
     def disp_info(self):
         print("ALL STUDENTS AND TEACHERS ENROLLED IN A COURSE")
         max_lengths = self.get_max_lengths()
-
-        print(self.course_list)
 
         print(
             "╔" + max_lengths[0] * "═" +
